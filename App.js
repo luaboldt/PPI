@@ -21,7 +21,7 @@ function HomeScreen({ navigation }) {
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
-    navigation.navigate('TelaTeste', { type, data });
+   // navigation.navigate('TelaTeste', { type, data });
   };
 
   if (hasPermission === null) {
