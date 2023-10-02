@@ -13,8 +13,13 @@ const audioMapping = {
   'https://get-qr.com/CGJxMp': require('./assets/audios/Lab-bio.mp3'), // Laboratório Biologia
   'https://get-qr.com/Pf1Kzc': require('./assets/audios/Lab-micro.mp3'), //Laboratório Microbiologia
   'https://get-qr.com/s4Mbx1': require('./assets/audios/Predio-B.mp3'), //Prédio B
-  'https://qrlogo.io/text/iuiete32h': require('./assets/audios/Lab-darwin.mp3'),  //Laboratório Darwin
-
+  'https://get-qr.com/irKHUi': require('./assets/audios/B-15.mp3'),
+  'https://get-qr.com/irKHUi': require('./assets/audios/B-15.mp3'),
+  'https://get-qr.com/irKHUi': require('./assets/audios/B-15.mp3'),
+  'https://get-qr.com/irKHUi': require('./assets/audios/B-15.mp3'),
+  'https://get-qr.com/irKHUi': require('./assets/audios/B-15.mp3'),
+  'https://get-qr.com/irKHUi': require('./assets/audios/B-15.mp3'),
+  'https://get-qr.com/irKHUi': require('./assets/audios/B-15.mp3'),
 
   //'data3': require('./assets/audios/audio3.mp3'),
   // Add more mappings as needed
@@ -22,8 +27,7 @@ const audioMapping = {
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(true);
-  const [audioPlaying, setAudioPlaying] = useState(false);
+  const [scanned, setScanned] = useState(false);
   
   
 
@@ -31,7 +35,7 @@ export default function App() {
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === 'granted');
-      // alert(`Pronto para escanear! confirme o aviso para continuar!`);
+      alert(`Pronto para escanear! confirme o aviso para continuar!`);
     };
 
     getBarCodeScannerPermissions();
@@ -39,21 +43,14 @@ export default function App() {
 
   const handleBarCodeScanned = async ({ type, data }) => {
     setScanned(true);
+    //alert(`Bar code with type ${type} and data ${data} has been scanned!`);
 
     if (audioMapping[data]) {
       const soundObject = new Audio.Sound();
       try {
-        setAudioPlaying(true);
         await soundObject.loadAsync(audioMapping[data]);
         await soundObject.playAsync();
-        
-        await soundObject.setOnPlaybackStatusUpdate((status) => {
-          if (status.didJustFinish) {
-            setAudioPlaying(false);
-          }
-        });
       } catch (error) {
-        setAudioPlaying(false);
         console.error(error);
       }
     } else {
@@ -70,13 +67,12 @@ export default function App() {
   }
 
   return (
-    
     <View style={css.container}>
       <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
       />
-      {scanned && !audioPlaying &&(
+      {scanned && (
         <SafeAreaView style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.button}
@@ -87,7 +83,6 @@ export default function App() {
       </SafeAreaView>
       )}
     </View>
-    
   );
 }
 
