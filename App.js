@@ -5,8 +5,8 @@ import { Audio } from 'expo-av';
 import { css } from './assets/css/Css';
 
 const audioMapping = {
-  'https://get-qr.com/_w4cra': require('./assets/audios/B-11.mp3'), //B-11
-  'https://get-qr.com/irKHUi': require('./assets/audios/B-15.mp3'), //B-15
+  'https://qrco.de/bePTPe': require('./assets/audios/B-11.mp3'), //B-11
+  'B-11': require('./assets/audios/B-15.mp3'), //B-15
   'https://get-qr.com/fymwh5': require('./assets/audios/2-andar-B.mp3'), //Segundo Andar B
   'https://get-qr.com/wJd1Rg': require('./assets/audios/Hall.mp3'), //Hall de Entrada
   'https://get-qr.com/v8vt-7': require('./assets/audios/2-andar-A.mp3'), //Segundo Andar A
@@ -19,6 +19,7 @@ const audioMapping = {
   //'data3': require('./assets/audios/audio3.mp3'),
   // Add more mappings as needed
 };
+
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
@@ -37,28 +38,66 @@ export default function App() {
     getBarCodeScannerPermissions();
   }, []);
 
+
+
+  
+
+const buscarDescri = async (data) => {
+  try {
+      const resp = await fetch(`http://sql10.freemysqlhosting.net/QRCode?req=${data}`,
+          { method: 'GET' })
+
+      const dados = await res.json();
+      if (dados) {
+        setText(dados);
+        setReadingText(true);
+        Speech.speak(dados, {
+          onDone: () => {
+            setReadingText(false); // Quando a leitura terminar, defina readingText como false
+          }
+        });
+      } else {
+        setReadingText(true);
+        Speech.speak('QR Code inválido.', {
+          onDone: () => {
+            setReadingText(false); 
+          }
+        });
+      } 
+  }
+  catch (erro) {
+      console.error(erro);
+  }
+}
+
+
+
   const handleBarCodeScanned = async ({ type, data }) => {
     setScanned(true);
 
-    if (audioMapping[data]) {
-      const soundObject = new Audio.Sound();
-      try {
-        setAudioPlaying(true);
-        await soundObject.loadAsync(audioMapping[data]);
-        await soundObject.playAsync();
+    console.log(data);
+
+
+    buscarDescri(data);
+    // if (audioMapping[data]) {
+    //   const soundObject = new Audio.Sound();
+    //   try {
+    //     setAudioPlaying(true);
+    //     await soundObject.loadAsync(audioMapping[data]);
+    //     await soundObject.playAsync();
         
-        await soundObject.setOnPlaybackStatusUpdate((status) => {
-          if (status.didJustFinish) {
-            setAudioPlaying(false);
-          }
-        });
-      } catch (error) {
-        setAudioPlaying(false);
-        console.error(error);
-      }
-    } else {
-      console.log('No audio mapping found for the scanned QR code data.');
-    }
+    //     await soundObject.setOnPlaybackStatusUpdate((status) => {
+    //       if (status.didJustFinish) {
+    //         setAudioPlaying(false);
+    //       }
+    //     });
+    //   } catch (error) {
+    //     setAudioPlaying(false);
+    //     console.error(error);
+    //   }
+    // } else {
+    //   console.log('No audio mapping found for the scanned QR code data.');
+    // }
   };
 
   if (hasPermission === null) {
@@ -112,3 +151,26 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
