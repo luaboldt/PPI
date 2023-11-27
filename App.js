@@ -40,7 +40,7 @@ export default function App() {
               setScanned(false);
             },
           });
-        } else {
+        } else if(dados) {
           setText(dados);
           setReadingText(true);
           Speech.speak(dados[0].descricao, {
