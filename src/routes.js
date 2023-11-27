@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql');
 
 const connection = mysql.createPool({
-    host     : 'db4free.net/', // O endereço da conexão (localhost).
+    host     : 'db4free.net', // O endereço da conexão (localhost).
     user     : 'admin_tsi',     // O nome de usuário do banco.
     password : 'admin@123',        // A senha do banco.
     database : 'qrmove'   // O nome do seu database.
@@ -12,51 +12,41 @@ const connection = mysql.createPool({
   // Iniciando o app.
 const app = express();
 
-// Criando uma rota GET que retorna os dados da tabela usuários.
-app.get('/idQRCode', function (req, res) {
-    // Conectando ao banco.
-    connection.getConnection(function (err, connection) {
-        if (err) {
-            // Handle error, send an error response, or throw an exception
-            res.status(500).send('Internal Server Error');
-            return;
-        }
+// Use bodyParser middleware to parse JSON in the request body
+app.use(bodyParser.json());
 
-        // Executando a query MySQL (selecionar todos os dados da tabela usuário).
-        //const idQRCode = req.params.idQRCode;
-        
-        // connection.query(`SELECT descricao FROM Sala s JOIN QRCode q WHERE q.idQRCode = ${idQRCode} and q.idSala = s.idSala`, function (error, results, fields) {
-        //     // Liberar a conexão, pois já terminamos de usar.
-        //     connection.release();
+app.post('/descricao', function (req, res) {
+    const { idQRCode } = req.body; // Assuming the QR code data is sent in the request body.
 
-        //     // Caso ocorra algum erro, não irá executar corretamente.
-        //     if (error) {
-        //         // Handle error, send an error response, or throw an exception
-        //         res.status(500).send('Internal Server Error');
-        //         return;
-        //     }
+    if (!idQRCode) {
+        res.status(400).send('Bad Request: QR code data missing.');
+        return;
+    }
 
-        connection.query(`SELECT descricao from Sala`, function (error, results, fields) {
-            // Liberar a conexão, pois já terminamos de usar.
-            connection.release();
-
-            // Caso ocorra algum erro, não irá executar corretamente.
+    connection.query(
+        `SELECT descricao FROM Sala s join QRCode q WHERE q.idQRCode = ? and q.idSala = s.idSala`,
+        [idQRCode],
+        function (error, results, fields) {
             if (error) {
-                // Handle error, send an error response, or throw an exception
-                res.status(500).send('Internal Server Error');
+                console.error(error);
+
+                // Return an error response with an 'error' property
+                res.status(500).json({ error: 'Internal Server Error' });
                 return;
             }
 
-            // Pegando a 'resposta' do servidor pra nossa requisição. Ou seja, aqui ele vai mandar nossos dados.
-            res.send(results);
-        });
-    });
+            if (results.length > 0) {
+                res.send(results);
+            } else {
+                res.status(404).json({ error: 'QR Code not found.' });
+            }
+        }
+    );
 });
 
-
 // Iniciando o servidor.
-app.listen(3306, () => {
-    console.log('Vai no navegador e entra em http://sql10.freemysqlhosting.net:3306/biruliro pra ver os usuários cadastrados.');
+app.listen(3000, () => {
+    console.log('Vai no navegador e entra em http://192.168.53.109:3000/descricao pra ver os usuários cadastrados.');
    });
    
 

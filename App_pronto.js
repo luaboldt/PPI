@@ -32,33 +32,27 @@ export default function App() {
 
       if (res.ok) {
         const dados = await res.json();
-        if (dados.error) {
-          setReadingText(true);
-          Speech.speak('QR Code inválido.', {
-            onDone: () => {
-              setReadingText(false);
-              setScanned(false);
-            },
-          });
-        } else {
+        if (dados.length > 0) {
+          console.log(dados[0].descricao);
           setText(dados);
           setReadingText(true);
           Speech.speak(dados[0].descricao, {
             onDone: () => {
               setReadingText(false);
-              setScanned(false);
+              setScanned(false); // Indicate that scanning is completed
+              //setScanningEnabled(true); // Enable scanning for the next cycle
             },
           });
-        } 
-      } else if (res.status) {
-        // Handle 404 Not Found
-        setReadingText(true);
-        Speech.speak('QR Code inválido.', {
-          onDone: () => {
-            setReadingText(false);
-            setScanned(false);
-          },
-        });
+        } else {
+          setReadingText(true);
+          Speech.speak('QR Code inválido.', {
+            onDone: () => {
+              setReadingText(false);
+              setScanned(false);
+              //setScanningEnabled(true);
+            },
+          });
+        }
       } else {
         console.error(`Error: ${res.status} - ${res.statusText}`);
       }
