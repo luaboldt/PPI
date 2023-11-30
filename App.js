@@ -3,6 +3,9 @@ import { Text, View, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-na
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import * as Speech from 'expo-speech';
 import { css } from './assets/css/Css';
+import {NetworkInfo} from 'react-native-network-info';
+import * as Network from 'expo-network';
+
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
@@ -10,6 +13,7 @@ export default function App() {
   const [text, setText] = useState('');
   const [readingText, setReadingText] = useState(false);
   const [scanningEnabled, setScanningEnabled] = useState(false);
+  const [ipAddress, setIpAddress] = useState('');
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
@@ -17,12 +21,25 @@ export default function App() {
       setHasPermission(status === 'granted');
     };
 
+    
+    const getLocalIpAddress = async () => {
+      try {
+        const localIp = await Network.getIpAddressAsync()
+        setIpAddress(localIp);
+      } catch (error) {
+        console.error('Error fetching local IP address:', error.message);
+      }
+    };
+
     getBarCodeScannerPermissions();
+    getLocalIpAddress(); // Fetch the public IP address
   }, []);
 
   const buscarDescri = async (data) => {
     try {
-      const res = await fetch('http://192.168.53.109:3000/descricao', {
+      console.log(`http://${ipAddress}:3000/descricao`);
+      //const res = await fetch(`http://${ipAddress}:3000/descricao`
+      const res = await fetch(`http://192.168.118.19:3000/descricao`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
